@@ -8,6 +8,8 @@ BASE_HEIGHT = canvas.height - 200;
 GRAVITY = 30;
 INITIAL_VELOCITY = 350;
 
+JUMPING = false;
+
 CAR_X = 200;
 CAR_Y = BASE_HEIGHT;
 
@@ -133,6 +135,12 @@ function addObstacle() {
 var jumpper = null;
 
 function jump() {
+  if (JUMPING) {
+    return -1;
+  } else {
+    JUMPING = true;
+  }
+
   if (jumpper) {
     clearInterval(jumpper);
   }
@@ -145,6 +153,7 @@ function jump() {
       CAR_Y = BASE_HEIGHT;
       clearInterval(jumpper);
       j = 1;
+      JUMPING = false;
     } else {
       CAR_Y = BASE_HEIGHT - e;
       j++;
