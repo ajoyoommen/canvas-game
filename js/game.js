@@ -4,9 +4,10 @@ var ctx = canvas.getContext('2d');
 ctx.canvas.width = window.innerWidth * 0.9;
 ctx.canvas.height = window.innerHeight * 0.8;
 
-var BASE_HEIGHT = canvas.height - 200;
-var CAR_X = 200;
-var CAR_Y = BASE_HEIGHT;
+BASE_HEIGHT = canvas.height - 200;
+JUMP_HEIGHT = 100;
+CAR_X = 200;
+CAR_Y = BASE_HEIGHT;
 
 GAME_SPEED = 2;
 MAP_UPDATE_INTERVAL = 10;
@@ -106,7 +107,6 @@ function drawBaseLine() {
 function render() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawBaseLine();
-  console.log(MAP.length);
 
   x_var = Math.random();
   y_var = Math.random();
@@ -120,11 +120,6 @@ function render() {
   }
 }
 
-function update () {
-  window.requestAnimationFrame(update, canvas);
-  render();
-}
-
 function addObstacle() {
   objects = [0, 2];
   var rand = objects[Math.floor(Math.random() * objects.length)];
@@ -132,10 +127,66 @@ function addObstacle() {
   MAP.splice(0, 1);
 }
 
+var jumpper = null;
+var falldown = null;
+
+
+function fall() {
+  if (falldown) {
+    clearInterval(falldown);
+  }
+
+  falldown = setInterval(function () {
+    if (CAR_Y <= BASE_HEIGHT) {
+      CAR_Y += 1;
+    }
+
+    if (CAR_Y >= BASE_HEIGHT) {
+      clearInterval(falldown);
+    }
+  }, 10);
+}
+
+function jump() {
+  if (jumpper) {
+    clearInterval(jumpper);
+  }
+
+  var max_jump = CAR_Y - JUMP_HEIGHT;
+  console.log("Max jump is " + max_jump);
+
+  jumpper = setInterval(function () {
+    console.log("Car y is " + CAR_Y);
+    if (CAR_Y >= max_jump) {
+      CAR_Y -= 1;
+      console.log("Reduced car y to " + CAR_Y);
+    }
+
+    if (CAR_Y <= max_jump) {
+      fall();
+      clearInterval(jumpper);
+    }
+  }, 10);
+}
+
+function keyDown(e) {
+  var keyCode = e.keyCode;
+  if(keyCode == 0 || keyCode == 32) {
+    jump();
+  }
+}
+
+function update () {
+  window.requestAnimationFrame(update, canvas);
+  render();
+}
+
 function startGame() {
   for (i=0; i<MAP.length; i++) {
     MAP[i] = 0;
   }
+
+  document.addEventListener("keydown", keyDown, false);
 
   setInterval(function () {
     MAP.splice(0, 2 * GAME_SPEED);
