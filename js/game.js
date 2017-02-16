@@ -5,9 +5,13 @@ ctx.canvas.width = window.innerWidth * 0.9;
 ctx.canvas.height = window.innerHeight * 0.8;
 
 BASE_HEIGHT = canvas.height - 200;
-JUMP_HEIGHT = 100;
+JUMP_HEIGHT = 150;
+GRAVITY = 50;
+INITIAL_VELOCITY = 100;
+
 CAR_X = 200;
 CAR_Y = BASE_HEIGHT;
+
 
 GAME_SPEED = 2;
 MAP_UPDATE_INTERVAL = 10;
@@ -128,45 +132,25 @@ function addObstacle() {
 }
 
 var jumpper = null;
-var falldown = null;
-
-
-function fall() {
-  if (falldown) {
-    clearInterval(falldown);
-  }
-
-  falldown = setInterval(function () {
-    if (CAR_Y <= BASE_HEIGHT) {
-      CAR_Y += 1;
-    }
-
-    if (CAR_Y >= BASE_HEIGHT) {
-      clearInterval(falldown);
-    }
-  }, 10);
-}
 
 function jump() {
   if (jumpper) {
     clearInterval(jumpper);
   }
 
-  var max_jump = CAR_Y - JUMP_HEIGHT;
-  console.log("Max jump is " + max_jump);
-
+  var j = 1;
   jumpper = setInterval(function () {
-    console.log("Car y is " + CAR_Y);
-    if (CAR_Y >= max_jump) {
-      CAR_Y -= 1;
-      console.log("Reduced car y to " + CAR_Y);
-    }
-
-    if (CAR_Y <= max_jump) {
-      fall();
+    t = (j * 16) / 1000;
+    e = (INITIAL_VELOCITY * t) - (0.5 * GRAVITY * Math.pow(t, 2));
+    if (e < 0) {
+      CAR_Y = BASE_HEIGHT;
       clearInterval(jumpper);
+      j = 1;
+    } else {
+      CAR_Y = BASE_HEIGHT - e;
+      j++;
     }
-  }, 10);
+  }, 16);
 }
 
 function keyDown(e) {
