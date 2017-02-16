@@ -5,9 +5,8 @@ ctx.canvas.width = window.innerWidth * 0.9;
 ctx.canvas.height = window.innerHeight * 0.8;
 
 BASE_HEIGHT = canvas.height - 200;
-JUMP_HEIGHT = 150;
-GRAVITY = 50;
-INITIAL_VELOCITY = 100;
+GRAVITY = 30;
+INITIAL_VELOCITY = 350;
 
 CAR_X = 200;
 CAR_Y = BASE_HEIGHT;
@@ -141,7 +140,7 @@ function jump() {
   var j = 1;
   jumpper = setInterval(function () {
     t = (j * 16) / 1000;
-    e = (INITIAL_VELOCITY * t) - (0.5 * GRAVITY * Math.pow(t, 2));
+    e = (INITIAL_VELOCITY * t) - (12 * GRAVITY * Math.pow(t, 2));
     if (e < 0) {
       CAR_Y = BASE_HEIGHT;
       clearInterval(jumpper);
