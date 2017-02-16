@@ -8,6 +8,9 @@ var BASE_HEIGHT = canvas.height - 200;
 var CAR_X = 200;
 var CAR_Y = BASE_HEIGHT;
 
+GAME_SPEED = 2;
+MAP_UPDATE_INTERVAL = 10;
+
 
 MAP = new Array(ctx.canvas.width);
 OBSTACLE_X = canvas.width;
@@ -103,6 +106,7 @@ function drawBaseLine() {
 function render() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawBaseLine();
+  console.log(MAP.length);
 
   x_var = Math.random();
   y_var = Math.random();
@@ -121,26 +125,30 @@ function update () {
   render();
 }
 
+function addObstacle() {
+  objects = [0, 2];
+  var rand = objects[Math.floor(Math.random() * objects.length)];
+  MAP.push(rand);
+  MAP.splice(0, 1);
+}
+
 function startGame() {
   for (i=0; i<MAP.length; i++) {
     MAP[i] = 0;
   }
 
   setInterval(function () {
-    MAP.splice(0, 2);
-    for (i=0; i<2; i++) {
+    MAP.splice(0, 2 * GAME_SPEED);
+    for (i=0; i<2 * GAME_SPEED; i++) {
       MAP.push(0);
     }
-  }, 10);
+  }, MAP_UPDATE_INTERVAL);
 
   setInterval(function () {
-    MAP.push(2);
-  }, 1500);
-
+    addObstacle();
+  }, 1000);
 
   update();
 }
 
-// Start updating the canvas
-update();
 startGame();
