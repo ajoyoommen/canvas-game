@@ -5,8 +5,11 @@ ctx.canvas.width = window.innerWidth * 0.9;
 ctx.canvas.height = window.innerHeight * 0.8;
 
 var BASE_HEIGHT = canvas.height - 200;
-var CAR_X = 300;
+var CAR_X = 200;
+var CAR_Y = BASE_HEIGHT;
 
+
+MAP = new Array(ctx.canvas.width);
 OBSTACLE_X = canvas.width;
 
 class Point {
@@ -103,13 +106,14 @@ function render() {
 
   x_var = Math.random();
   y_var = Math.random();
-  drawCar(new Point(CAR_X - x_var*3, BASE_HEIGHT - y_var*2));
 
-  OBSTACLE_X -= 5;
-  if (OBSTACLE_X <= 0) {
-    OBSTACLE_X = canvas.width;
+  drawCar(new Point(CAR_X - x_var, CAR_Y - y_var));
+
+  for (i=0; i<MAP.length; i++) {
+    if (MAP[i] == 2) {
+      drawObstacle(new Point(i, BASE_HEIGHT));
+    }
   }
-  drawObstacle(new Point(OBSTACLE_X, BASE_HEIGHT));  
 }
 
 function update () {
@@ -117,5 +121,26 @@ function update () {
   render();
 }
 
+function startGame() {
+  for (i=0; i<MAP.length; i++) {
+    MAP[i] = 0;
+  }
+
+  setInterval(function () {
+    MAP.splice(0, 2);
+    for (i=0; i<2; i++) {
+      MAP.push(0);
+    }
+  }, 10);
+
+  setInterval(function () {
+    MAP.push(2);
+  }, 1500);
+
+
+  update();
+}
+
 // Start updating the canvas
 update();
+startGame();
