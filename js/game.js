@@ -29,23 +29,6 @@ function contextColor(color, lineWidth) {
   ctx.lineWidth = lineWidth;
 }
 
-function drawCloud(pos) {
-	ctx.beginPath();
-  ctx.moveTo(170, 80);
-  ctx.bezierCurveTo(130, 100, 130, 150, 230, 150);
-  ctx.bezierCurveTo(250, 180, 320, 180, 340, 150);
-  ctx.bezierCurveTo(420, 150, 420, 120, 390, 100);
-  ctx.bezierCurveTo(430, 40, 370, 30, 340, 50);
-  ctx.bezierCurveTo(320, 5, 250, 20, 250, 50);
-  ctx.bezierCurveTo(200, 5, 150, 20, 170, 80);
-  ctx.closePath();
-  ctx.lineWidth = 5;
-  contextColor("#EEE");
-  ctx.fill();
-  contextColor("#555");
-  ctx.stroke();
-}
-
 function drawLine(start, stop) {
   ctx.beginPath();
   ctx.moveTo(start.x, start.y);
@@ -117,7 +100,6 @@ function drawBaseLine() {
 function render() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawBaseLine();
-  drawCloud(new Point(1,2));
 
   x_var = Math.random();
   y_var = Math.random();
