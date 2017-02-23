@@ -4,23 +4,6 @@ var ctx = canvas.getContext('2d');
 ctx.canvas.width = window.innerWidth * 0.9;
 ctx.canvas.height = window.innerHeight * 0.8;
 
-BASE_HEIGHT = canvas.height - 200;
-GRAVITY = 30;
-INITIAL_VELOCITY = 350;
-
-JUMPING = false;
-
-CAR_X = 200;
-CAR_Y = BASE_HEIGHT;
-
-
-GAME_SPEED = 2;
-MAP_UPDATE_INTERVAL = 10;
-
-
-MAP = new Array(ctx.canvas.width);
-OBSTACLE_X = canvas.width;
-
 class Point {
   constructor(x, y) {
     this.x = x;
@@ -28,109 +11,127 @@ class Point {
   }
 }
 
-function contextColor(color, lineWidth) {
-  if (color == undefined) {
-    color = 'black';
+var game = {
+  BASE_HEIGHT: canvas.height - 200,
+  GRAVITY: 30,
+  INITIAL_VELOCITY: 350,
+  JUMPING: false,
+  CAR_X: 200,
+  CAR_Y: this.BASE_HEIGHT,
+  GAME_SPEED: 2,
+  MAP_UPDATE_INTERVAL: 10,
+  MAP: new Array(ctx.canvas.width),
+  OBSTACLE_X: canvas.width,
+
+  addObstacle: function () {
+    objects = [0, 2];
+    rand = objects[Math.floor(Math.random() * objects.length)];
+    this.MAP.push(rand);
+    this.MAP.splice(0, 1);
   }
-  ctx.strokeStyle = color;
-  ctx.fillStyle = color;
+};
 
-  if (lineWidth == undefined) {
-    lineWidth = 1;
-  }
-  ctx.lineWidth = lineWidth;
-}
 
-function drawLine(start, stop) {
-  ctx.beginPath();
-  ctx.moveTo(start.x, start.y);
-  ctx.lineTo(stop.x, stop.y);
-  ctx.closePath();
-  ctx.stroke();
-}
+var gameCanvas = {
+  ctx: ctx,
 
-function drawCircle(pos, radius) {
-  ctx.beginPath();
-  ctx.arc(pos.x, pos.y, radius, 0, Math.PI * 2, true);
-  ctx.closePath();
-  ctx.fill();
-}
+  contextColor: function (color, lineWidth) {
+    if (color == undefined) {
+      color = 'black';
+    }
+    this.ctx.strokeStyle = color;
+    this.ctx.fillStyle = color;
 
-var start = new Point(0, BASE_HEIGHT);
-var stop = new Point(canvas.width, BASE_HEIGHT);
-drawLine(start, stop, 'black');
+    if (lineWidth == undefined) {
+      lineWidth = 1;
+    }
+    this.ctx.lineWidth = lineWidth;
+  },
 
-function drawDino(pos) {
-  // Left leg
-  contextColor("black", 5);
-  drawLine(pos, new Point(pos.x + 5, pos.y - 20));
-  // Right leg
-  drawLine(new Point(pos.x + 30, pos.y), new Point(pos.x + 15, pos.y - 30));
-  contextColor();
-  ctx.beginPath();
-  ctx.arc(pos.x + 10, pos.y - 40, 20, 0, Math.PI * 2, true);
-  ctx.closePath();
-  ctx.fill();
-}
+  drawLine: function (start, stop) {
+    this.ctx.beginPath();
+    this.ctx.moveTo(start.x, start.y);
+    this.ctx.lineTo(stop.x, stop.y);
+    this.ctx.closePath();
+    this.ctx.stroke();
+  },
 
-function drawCar(pos) {
-  contextColor("black");
-  drawCircle(new Point(pos.x, pos.y - 10), 10);
-  drawCircle(new Point(pos.x + 100, pos.y - 10), 10);
+  drawCircle: function (pos, radius) {
+    this.ctx.beginPath();
+    this.ctx.arc(pos.x, pos.y, radius, 0, Math.PI * 2, true);
+    this.ctx.closePath();
+    this.ctx.fill();
+  },
 
-  // Draw hood
-  contextColor("#550");
-  ctx.beginPath();
-  ctx.moveTo(pos.x + 130, pos.y - 17);
-  ctx.lineTo(pos.x + 130, pos.y - 35);
-  ctx.lineTo(pos.x + 90, pos.y - 35);
-  ctx.lineTo(pos.x + 70, pos.y - 60);
-  ctx.lineTo(pos.x + 5, pos.y - 60);
-  ctx.lineTo(pos.x + 5, pos.y - 35);
-  ctx.lineTo(pos.x - 30, pos.y - 35);
-  ctx.lineTo(pos.x - 30, pos.y - 17);
-  ctx.closePath();
-  ctx.fill();
-}
+  drawDino: function (pos) {
+    // Left leg
+    this.contextColor("black", 5);
+    this.drawLine(pos, new Point(pos.x + 5, pos.y - 20));
+    // Right leg
+    this.thisdrawLine(new Point(pos.x + 30, pos.y), new Point(pos.x + 15, pos.y - 30));
+    this.contextColor();
+    this.ctx.beginPath();
+    this.ctx.arc(pos.x + 10, pos.y - 40, 20, 0, Math.PI * 2, true);
+    this.ctx.closePath();
+    this.ctx.fill();
+  },
 
-function drawObstacle(pos) {
-  contextColor("#e94200");
-  ctx.beginPath();
-  ctx.moveTo(pos.x - 20, pos.y);
-  ctx.lineTo(pos.x - 5, pos.y - 50);
-  ctx.lineTo(pos.x + 5, pos.y - 50);
-  ctx.lineTo(pos.x + 20, pos.y);
-  ctx.closePath();
-  ctx.fill();
-}
+  drawCar: function (pos) {
+    this.contextColor("black");
+    this.drawCircle(new Point(pos.x, pos.y - 10), 10);
+    this.drawCircle(new Point(pos.x + 100, pos.y - 10), 10);
 
-function drawBaseLine() {
-  contextColor("black", 3);
-  drawLine(new Point(0, BASE_HEIGHT), new Point(canvas.width, BASE_HEIGHT));
-}
+    // Draw hood
+    this.contextColor("#550");
+    this.ctx.beginPath();
+    this.ctx.moveTo(pos.x + 130, pos.y - 17);
+    this.ctx.lineTo(pos.x + 130, pos.y - 35);
+    this.ctx.lineTo(pos.x + 90, pos.y - 35);
+    this.ctx.lineTo(pos.x + 70, pos.y - 60);
+    this.ctx.lineTo(pos.x + 5, pos.y - 60);
+    this.ctx.lineTo(pos.x + 5, pos.y - 35);
+    this.ctx.lineTo(pos.x - 30, pos.y - 35);
+    this.ctx.lineTo(pos.x - 30, pos.y - 17);
+    this.ctx.closePath();
+    this.ctx.fill();
+  },
 
-function render() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawBaseLine();
+  drawObstacle: function (pos) {
+    this.contextColor("#e94200");
+    this.ctx.beginPath();
+    this.ctx.moveTo(pos.x - 20, pos.y);
+    this.ctx.lineTo(pos.x - 5, pos.y - 50);
+    this.ctx.lineTo(pos.x + 5, pos.y - 50);
+    this.ctx.lineTo(pos.x + 20, pos.y);
+    this.ctx.closePath();
+    this.ctx.fill();
+  },
 
-  x_var = Math.random();
-  y_var = Math.random();
+  drawBaseLine: function () {
+    this.contextColor("black", 3);
+    this.drawLine(new Point(0, game.BASE_HEIGHT), new Point(canvas.width, game.BASE_HEIGHT));
+  },
 
-  drawCar(new Point(CAR_X - x_var, CAR_Y - y_var));
+  render: function () {
+    this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+    this.drawBaseLine();
 
-  for (i=0; i<MAP.length; i++) {
-    if (MAP[i] == 2) {
-      drawObstacle(new Point(i, BASE_HEIGHT));
+    x_var = Math.random();
+    y_var = Math.random();
+
+    this.drawCar(new Point(CAR_X - x_var, CAR_Y - y_var));
+
+    for (i=0; i<MAP.length; i++) {
+      if (MAP[i] == 2) {
+        this.drawObstacle(new Point(i, game.BASE_HEIGHT));
+      }
     }
   }
-}
+};
 
-function addObstacle() {
-  objects = [0, 2];
-  var rand = objects[Math.floor(Math.random() * objects.length)];
-  MAP.push(rand);
-  MAP.splice(0, 1);
-}
+var start = new Point(0, game.BASE_HEIGHT);
+var stop = new Point(canvas.width, game.BASE_HEIGHT);
+canvas.drawLine(start, stop, 'black');
 
 var jumpper = null;
 
@@ -150,12 +151,12 @@ function jump() {
     t = (j * 16) / 1000;
     e = (INITIAL_VELOCITY * t) - (12 * GRAVITY * Math.pow(t, 2));
     if (e < 0) {
-      CAR_Y = BASE_HEIGHT;
+      CAR_Y = game.BASE_HEIGHT;
       clearInterval(jumpper);
       j = 1;
       JUMPING = false;
     } else {
-      CAR_Y = BASE_HEIGHT - e;
+      CAR_Y = game.BASE_HEIGHT - e;
       j++;
     }
   }, 16);
@@ -170,22 +171,22 @@ function keyDown(e) {
 
 function update () {
   window.requestAnimationFrame(update, canvas);
-  render();
+  canvas.render();
 }
 
 function startGame() {
-  for (i=0; i<MAP.length; i++) {
-    MAP[i] = 0;
+  for (i=0; i<game.MAP.length; i++) {
+    game.MAP[i] = 0;
   }
 
   document.addEventListener("keydown", keyDown, false);
 
   setInterval(function () {
-    MAP.splice(0, 2 * GAME_SPEED);
+    game.MAP.splice(0, 2 * GAME_SPEED);
     for (i=0; i<2 * GAME_SPEED; i++) {
-      MAP.push(0);
+      game.MAP.push(0);
     }
-  }, MAP_UPDATE_INTERVAL);
+  }, game.MAP_UPDATE_INTERVAL);
 
   setInterval(function () {
     addObstacle();
