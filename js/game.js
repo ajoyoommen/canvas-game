@@ -4,9 +4,21 @@ var ctx = canvas.getContext('2d');
 ctx.canvas.width = window.innerWidth * 0.9;
 ctx.canvas.height = window.innerHeight * 0.8;
 
-var BASE_HEIGHT = canvas.height - 200;
-var CAR_X = 300;
+BASE_HEIGHT = canvas.height - 200;
+GRAVITY = 30;
+INITIAL_VELOCITY = 350;
 
+JUMPING = false;
+
+CAR_X = 200;
+CAR_Y = BASE_HEIGHT;
+
+
+GAME_SPEED = 2;
+MAP_UPDATE_INTERVAL = 10;
+
+
+MAP = new Array(ctx.canvas.width);
 OBSTACLE_X = canvas.width;
 
 class Point {
@@ -103,13 +115,57 @@ function render() {
 
   x_var = Math.random();
   y_var = Math.random();
-  drawCar(new Point(CAR_X - x_var*3, BASE_HEIGHT - y_var*2));
 
-  OBSTACLE_X -= 5;
-  if (OBSTACLE_X <= 0) {
-    OBSTACLE_X = canvas.width;
+  drawCar(new Point(CAR_X - x_var, CAR_Y - y_var));
+
+  for (i=0; i<MAP.length; i++) {
+    if (MAP[i] == 2) {
+      drawObstacle(new Point(i, BASE_HEIGHT));
+    }
   }
-  drawObstacle(new Point(OBSTACLE_X, BASE_HEIGHT));  
+}
+
+function addObstacle() {
+  objects = [0, 2];
+  var rand = objects[Math.floor(Math.random() * objects.length)];
+  MAP.push(rand);
+  MAP.splice(0, 1);
+}
+
+var jumpper = null;
+
+function jump() {
+  if (JUMPING) {
+    return -1;
+  } else {
+    JUMPING = true;
+  }
+
+  if (jumpper) {
+    clearInterval(jumpper);
+  }
+
+  var j = 1;
+  jumpper = setInterval(function () {
+    t = (j * 16) / 1000;
+    e = (INITIAL_VELOCITY * t) - (12 * GRAVITY * Math.pow(t, 2));
+    if (e < 0) {
+      CAR_Y = BASE_HEIGHT;
+      clearInterval(jumpper);
+      j = 1;
+      JUMPING = false;
+    } else {
+      CAR_Y = BASE_HEIGHT - e;
+      j++;
+    }
+  }, 16);
+}
+
+function keyDown(e) {
+  var keyCode = e.keyCode;
+  if(keyCode == 0 || keyCode == 32) {
+    jump();
+  }
 }
 
 function update () {
@@ -117,5 +173,25 @@ function update () {
   render();
 }
 
-// Start updating the canvas
-update();
+function startGame() {
+  for (i=0; i<MAP.length; i++) {
+    MAP[i] = 0;
+  }
+
+  document.addEventListener("keydown", keyDown, false);
+
+  setInterval(function () {
+    MAP.splice(0, 2 * GAME_SPEED);
+    for (i=0; i<2 * GAME_SPEED; i++) {
+      MAP.push(0);
+    }
+  }, MAP_UPDATE_INTERVAL);
+
+  setInterval(function () {
+    addObstacle();
+  }, 1000);
+
+  update();
+}
+
+startGame();
